@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="description" content="HogarConnect - Plataforma profesional de servicios del hogar. Conectamos clientes con trabajadores calificados. ODS 8: Trabajo Decente y Crecimiento Económico.">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#0b2618">
     <meta name="keywords" content="servicios del hogar, plomería, electricidad, limpieza, trabajadores, ODS8">
     <meta name="author" content="HogarConnect">
     <title>HogarConnect | Plataforma Profesional de Servicios del Hogar</title>
@@ -18,7 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230a1628'/%3E%3Ctext x='50' y='68' font-size='48' text-anchor='middle' fill='%23c6a43f' font-family='Arial, sans-serif' font-weight='bold'%3EH%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230b2618'/%3E%3Ctext x='50' y='68' font-size='48' text-anchor='middle' fill='%2352b788' font-family='Arial, sans-serif' font-weight='bold'%3EH%3C/text%3E%3C/svg%3E">
 </head>
 <body>
 
@@ -26,7 +26,7 @@
     <!-- PANTALLA DE AUTENTICACIÓN (LOGIN/REGISTRO) -->
     <!-- ========================================== -->
     <div id="auth-container" class="auth-container">
-        <div class="auth-grid">
+        <div class="auth-grid glass-card">
             <!-- Lado izquierdo - Hero -->
             <div class="auth-hero">
                 <div class="hero-content">
@@ -55,7 +55,7 @@
             
             <!-- Lado derecho - Formularios -->
             <div class="auth-form-container">
-                <div class="form-card">
+                <div class="form-card glass-card-light">
                     <div class="form-tabs">
                         <button class="form-tab active" data-tab="login">Iniciar Sesión</button>
                         <button class="form-tab" data-tab="register">Crear Cuenta</button>
@@ -63,38 +63,38 @@
                     
                     <!-- Formulario de Login -->
                     <form id="login-form" class="auth-form active">
-                        <div class="input-field">
+                        <div class="input-field glass-input">
                             <i class="fas fa-envelope"></i>
                             <input type="email" placeholder="correo@ejemplo.com" id="login-email" required autocomplete="email">
                         </div>
-                        <div class="input-field">
+                        <div class="input-field glass-input">
                             <i class="fas fa-lock"></i>
                             <input type="password" placeholder="Contraseña" id="login-password" required autocomplete="current-password">
                         </div>
-                        <button type="submit" class="btn-primary btn-block">
+                        <button type="submit" class="btn-primary btn-block glass-btn">
                             <i class="fas fa-arrow-right"></i> Ingresar
                         </button>
                     </form>
                     
                     <!-- Formulario de Registro -->
                     <form id="register-form" class="auth-form">
-                        <div class="input-field">
+                        <div class="input-field glass-input">
                             <i class="fas fa-user"></i>
                             <input type="text" placeholder="Nombre completo" id="reg-name" required autocomplete="name">
                         </div>
-                        <div class="input-field">
+                        <div class="input-field glass-input">
                             <i class="fas fa-envelope"></i>
                             <input type="email" placeholder="correo@ejemplo.com" id="reg-email" required autocomplete="email">
                         </div>
-                        <div class="input-field">
+                        <div class="input-field glass-input">
                             <i class="fas fa-phone"></i>
                             <input type="tel" placeholder="Teléfono (opcional)" id="reg-phone" autocomplete="tel">
                         </div>
-                        <div class="input-field">
+                        <div class="input-field glass-input">
                             <i class="fas fa-lock"></i>
                             <input type="password" placeholder="Contraseña (mínimo 6 caracteres)" id="reg-password" required autocomplete="new-password">
                         </div>
-                        <div class="input-field">
+                        <div class="input-field glass-input">
                             <i class="fas fa-user-tag"></i>
                             <select id="reg-role">
                                 <option value="cliente">Cliente - Necesito servicios</option>
@@ -102,12 +102,12 @@
                             </select>
                         </div>
                         <div id="skills-field" style="display: none;">
-                            <div class="input-field">
+                            <div class="input-field glass-input">
                                 <i class="fas fa-tools"></i>
                                 <input type="text" placeholder="Tus habilidades (ej: Plomería, Electricidad, Limpieza)" id="reg-skills">
                             </div>
                         </div>
-                        <button type="submit" class="btn-primary btn-block">
+                        <button type="submit" class="btn-primary btn-block glass-btn">
                             <i class="fas fa-user-plus"></i> Crear cuenta
                         </button>
                     </form>
@@ -123,8 +123,8 @@
     <!-- ========================================== -->
     <div id="dashboard" style="display: none;">
         
-        <!-- Header con navegación -->
-        <header class="dashboard-header">
+        <!-- Header con navegación (glassmorphism) -->
+        <header class="dashboard-header glass-header">
             <div class="header-container">
                 <div class="logo">
                     <i class="fas fa-hand-holding-heart"></i>
@@ -132,7 +132,7 @@
                 </div>
                 
                 <!-- Navegación principal -->
-                <nav class="main-nav">
+                <nav class="main-nav glass-nav">
                     <button class="nav-link active" data-view="marketplace">
                         <i class="fas fa-grid-2"></i> Marketplace
                     </button>
@@ -153,10 +153,10 @@
                 <!-- Menú de usuario -->
                 <div class="user-menu">
                     <!-- Notificaciones -->
-                    <div class="notification-bell" id="notification-bell">
+                    <div class="notification-bell glass-icon" id="notification-bell">
                         <i class="fas fa-bell-ring"></i>
                         <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
-                        <div class="notification-dropdown" id="notification-dropdown">
+                        <div class="notification-dropdown glass-dropdown" id="notification-dropdown">
                             <div class="notification-header">
                                 <h4>Notificaciones</h4>
                                 <button class="mark-all-read" id="mark-all-read">Marcar todas como leídas</button>
@@ -166,20 +166,20 @@
                     </div>
                     
                     <!-- Selector de tema (modo oscuro/claro) -->
-                    <div class="theme-toggle">
+                    <div class="theme-toggle glass-toggle">
                         <button id="theme-light" class="active">🌞</button>
                         <button id="theme-dark">🌙</button>
                     </div>
                     
                     <!-- Avatar y datos del usuario -->
-                    <div class="user-avatar" id="user-avatar">
+                    <div class="user-avatar glass-avatar" id="user-avatar">
                         <span id="user-avatar-text">U</span>
                     </div>
                     <div class="user-details">
                         <span id="user-name" class="user-name"></span>
                         <span id="user-role" class="user-role-badge"></span>
                     </div>
-                    <button id="logout-btn" class="btn-icon" title="Cerrar sesión">
+                    <button id="logout-btn" class="btn-icon glass-icon-btn" title="Cerrar sesión">
                         <i class="fas fa-arrow-right-from-bracket"></i>
                     </button>
                 </div>
@@ -193,19 +193,19 @@
             <div id="marketplace-view" class="view active">
                 <div class="view-header">
                     <h2><i class="fas fa-grid-2"></i> Marketplace de Servicios</h2>
-                    <button id="show-publish-btn" class="btn-primary">
+                    <button id="show-publish-btn" class="btn-primary glass-btn">
                         <i class="fas fa-plus"></i> Publicar Servicio
                     </button>
                 </div>
                 
                 <!-- Formulario para publicar servicio -->
-                <div id="publish-form" class="publish-card" style="display: none;">
+                <div id="publish-form" class="publish-card glass-card" style="display: none;">
                     <h3><i class="fas fa-pen-to-square"></i> Nueva Solicitud de Servicio</h3>
                     <div class="form-grid">
-                        <input type="text" id="service-title" placeholder="Título del servicio" class="full-width">
-                        <textarea id="service-desc" placeholder="Descripción detallada del trabajo a realizar" rows="3"></textarea>
-                        <input type="text" id="service-location" placeholder="Dirección donde se realizará el servicio">
-                        <select id="service-category">
+                        <input type="text" id="service-title" placeholder="Título del servicio" class="full-width glass-input">
+                        <textarea id="service-desc" placeholder="Descripción detallada del trabajo a realizar" rows="3" class="glass-input"></textarea>
+                        <input type="text" id="service-location" placeholder="Dirección donde se realizará el servicio" class="glass-input">
+                        <select id="service-category" class="glass-input">
                             <option value="Plomería">Plomería</option>
                             <option value="Electricidad">Electricidad</option>
                             <option value="Limpieza">Limpieza</option>
@@ -218,33 +218,33 @@
                             <option value="Cerrajería">Cerrajería</option>
                             <option value="General">General</option>
                         </select>
-                        <input type="number" id="service-price" placeholder="Precio propuesto ($)">
+                        <input type="number" id="service-price" placeholder="Precio propuesto ($)" class="glass-input">
                     </div>
                     <div class="form-actions">
-                        <button id="submit-service" class="btn-primary">Publicar Servicio</button>
-                        <button id="cancel-publish" class="btn-secondary">Cancelar</button>
+                        <button id="submit-service" class="btn-primary glass-btn">Publicar Servicio</button>
+                        <button id="cancel-publish" class="btn-secondary glass-btn-secondary">Cancelar</button>
                     </div>
                 </div>
                 
                 <!-- Barra de filtros avanzados -->
-                <div class="filters-bar">
+                <div class="filters-bar glass-card">
                     <div class="filters-grid">
                         <div class="filter-group">
                             <label>Categoría</label>
-                            <select id="filter-category">
+                            <select id="filter-category" class="glass-input">
                                 <option value="all">Todas las categorías</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label>Rango de precio</label>
                             <div class="price-range">
-                                <input type="number" id="filter-min-price" placeholder="Mínimo">
-                                <input type="number" id="filter-max-price" placeholder="Máximo">
+                                <input type="number" id="filter-min-price" placeholder="Mínimo" class="glass-input">
+                                <input type="number" id="filter-max-price" placeholder="Máximo" class="glass-input">
                             </div>
                         </div>
                         <div class="filter-group">
                             <label>Ordenar por</label>
-                            <select id="filter-sort">
+                            <select id="filter-sort" class="glass-input">
                                 <option value="recent">Más recientes</option>
                                 <option value="price_asc">Menor precio</option>
                                 <option value="price_desc">Mayor precio</option>
@@ -253,12 +253,12 @@
                         <div class="filter-group search-box">
                             <label>Buscar</label>
                             <i class="fas fa-search"></i>
-                            <input type="text" id="search-input" placeholder="Buscar servicios...">
+                            <input type="text" id="search-input" placeholder="Buscar servicios..." class="glass-input">
                         </div>
                     </div>
                     <div class="filters-actions">
-                        <button id="apply-filters" class="btn-primary">Aplicar filtros</button>
-                        <button id="reset-filters" class="btn-secondary">Limpiar</button>
+                        <button id="apply-filters" class="btn-primary glass-btn">Aplicar filtros</button>
+                        <button id="reset-filters" class="btn-secondary glass-btn-secondary">Limpiar</button>
                     </div>
                 </div>
                 
@@ -286,7 +286,7 @@
             <div id="analytics-view" class="view">
                 <div class="view-header">
                     <h2><i class="fas fa-chart-mixed"></i> Estadísticas de la Plataforma</h2>
-                    <button id="start-tour" class="btn-secondary">
+                    <button id="start-tour" class="btn-secondary glass-btn-secondary">
                         <i class="fas fa-question-circle"></i> Tour guiado
                     </button>
                 </div>
@@ -310,21 +310,21 @@
     
     <!-- Modal de Chat -->
     <div id="chat-modal" class="modal">
-        <div class="modal-dialog">
+        <div class="modal-dialog glass-modal">
             <div class="modal-header">
                 <h3><i class="fas fa-message-dots"></i> Conversación</h3>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="chat-container">
-                <div class="chat-sidebar" id="chat-sidebar"></div>
+                <div class="chat-sidebar glass-sidebar" id="chat-sidebar"></div>
                 <div class="chat-conversation">
                     <div id="chat-messages" class="chat-messages"></div>
-                    <div class="chat-input-area">
+                    <div class="chat-input-area glass-input-area">
                         <button class="emoji-picker-btn" id="emoji-picker-btn">
                             <i class="far fa-smile-wink"></i>
                         </button>
-                        <input type="text" id="chat-message-input" placeholder="Escribe tu mensaje...">
-                        <button id="chat-send-btn" class="btn-primary">
+                        <input type="text" id="chat-message-input" placeholder="Escribe tu mensaje..." class="glass-input">
+                        <button id="chat-send-btn" class="btn-primary glass-btn">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
@@ -335,7 +335,7 @@
     
     <!-- Modal de Calificación -->
     <div id="rating-modal" class="modal">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-sm glass-modal">
             <div class="modal-header">
                 <h3><i class="fas fa-star-sharp"></i> Calificar Servicio</h3>
                 <button class="modal-close">&times;</button>
@@ -348,38 +348,38 @@
                     <i class="far fa-star" data-rating="4"></i>
                     <i class="far fa-star" data-rating="5"></i>
                 </div>
-                <textarea id="rating-comment" placeholder="Comparte tu experiencia con este trabajador..."></textarea>
-                <button id="submit-rating" class="btn-primary btn-block">Enviar Calificación</button>
+                <textarea id="rating-comment" placeholder="Comparte tu experiencia con este trabajador..." class="glass-input"></textarea>
+                <button id="submit-rating" class="btn-primary btn-block glass-btn">Enviar Calificación</button>
             </div>
         </div>
     </div>
     
     <!-- Modal de Edición de Perfil -->
     <div id="edit-profile-modal" class="modal">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-sm glass-modal">
             <div class="modal-header">
                 <h3><i class="fas fa-user-pen"></i> Editar Perfil</h3>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="input-field">
+                <div class="input-field glass-input">
                     <i class="fas fa-phone"></i>
                     <input type="tel" id="edit-phone" placeholder="Teléfono">
                 </div>
-                <div class="input-field">
+                <div class="input-field glass-input">
                     <i class="fas fa-info-circle"></i>
                     <textarea id="edit-description" placeholder="Descripción / Biografía" rows="3"></textarea>
                 </div>
                 <div id="edit-skills-container" style="display: none;">
-                    <div class="input-field">
+                    <div class="input-field glass-input">
                         <i class="fas fa-tools"></i>
                         <input type="text" id="edit-skills" placeholder="Habilidades (separadas por coma)">
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="save-profile" class="btn-primary">Guardar cambios</button>
-                <button class="btn-secondary modal-close">Cancelar</button>
+                <button id="save-profile" class="btn-primary glass-btn">Guardar cambios</button>
+                <button class="btn-secondary glass-btn-secondary modal-close">Cancelar</button>
             </div>
         </div>
     </div>
@@ -388,12 +388,12 @@
     <!-- TOUR GUIADO (Overlay) -->
     <!-- ========================================== -->
     <div id="tour-overlay" class="tour-overlay" style="display: none;"></div>
-    <div id="tour-step" class="tour-step" style="display: none;">
+    <div id="tour-step" class="tour-step glass-tour" style="display: none;">
         <h4 id="tour-title"></h4>
         <p id="tour-content"></p>
         <div class="tour-buttons">
-            <button id="tour-next" class="btn-primary">Siguiente</button>
-            <button id="tour-end" class="btn-secondary">Cerrar</button>
+            <button id="tour-next" class="btn-primary glass-btn">Siguiente</button>
+            <button id="tour-end" class="btn-secondary glass-btn-secondary">Cerrar</button>
         </div>
     </div>
 
