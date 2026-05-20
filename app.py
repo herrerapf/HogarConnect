@@ -24,11 +24,12 @@ app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'hogarconnect_super_s
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
 jwt = JWTManager(app)
 
-# Rate Limiting para prevenir spam - VERSIÓN CORREGIDA
+# Rate Limiting
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"]
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
 )
 
 # Configuración
