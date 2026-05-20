@@ -1,0 +1,55 @@
+{
+  "users": [
+    {
+      "id": "1776702279231",
+      "name": "Andres Herrera",
+      "email": "andresherrera0893@gmail.com",
+      "password": "$2b$12$gM3L.VK2WCCOVlzF/uGQNux2Dar7rnGSAOEmAPDpD453xQUF5ZeI.",
+      "role": "cliente",
+      "phone": "3046576234",
+      "skills": [],
+      "avatar": "AH",
+      "description": "",
+      "rating": 0,
+      "totalRatings": 0,
+      "completedJobs": 0,
+      "responseRate": 100,
+      "verified": false,
+      "createdAt": "2026-04-20T11:24:39.231520"
+    }
+  ],
+  "serviceRequests": [],
+  "chats": [],
+  "ratings": [],
+  "favorites": [],
+  "notifications": [
+    {
+      "id": "1776702279265",
+      "userId": "1776702279231",
+      "title": "Bienvenido a HogarConnect",
+      "message": "¡Gracias por unirte Andres Herrera! Comienza a explorar la plataforma.",
+      "type": "welcome",
+      "relatedId": null,
+      "read": false,
+      "createdAt": "2026-04-20T11:24:39.265869"
+    }
+  ],
+  "userSessions": [],
+  "categories": [
+    "Plomería",
+    "Electricidad",
+    "Limpieza",
+    "Carpintería",
+    "Jardinería",
+    "Pintura",
+    "Mudanzas",
+    "Reparaciones",
+    "Electrodomésticos",
+    "Cerrajería",
+    "Techos",
+    "Piscinas",
+    "Albañilería",
+    "Soldadura",
+    "Tapicería"
+  ]
+}

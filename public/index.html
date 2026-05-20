@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="description" content="HogarConnect - Plataforma profesional de servicios del hogar. Conectamos clientes con trabajadores calificados. ODS 8: Trabajo Decente y Crecimiento Económico.">
+    <meta name="theme-color" content="#0a1628">
+    <meta name="keywords" content="servicios del hogar, plomería, electricidad, limpieza, trabajadores, ODS8">
+    <meta name="author" content="HogarConnect">
+    <title>HogarConnect | Plataforma Profesional de Servicios del Hogar</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Chart.js para analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230a1628'/%3E%3Ctext x='50' y='68' font-size='48' text-anchor='middle' fill='%23c6a43f' font-family='Arial, sans-serif' font-weight='bold'%3EH%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- PANTALLA DE AUTENTICACIÓN (LOGIN/REGISTRO) -->
+    <!-- ========================================== -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-grid">
+            <!-- Lado izquierdo - Hero -->
+            <div class="auth-hero">
+                <div class="hero-content">
+                    <div class="logo-large">
+                        <i class="fas fa-handshake"></i>
+                        <h1>Hogar<span>Connect</span></h1>
+                    </div>
+                    <h2>Trabajo Decente · Crecimiento Económico</h2>
+                    <p>Plataforma profesional que conecta clientes con trabajadores calificados del hogar. Transparencia, seguridad y eficiencia en cada servicio.</p>
+                    <div class="stats-preview">
+                        <div class="stat-item">
+                            <span class="stat-number" id="stat-users">0</span>
+                            <span class="stat-label">Usuarios</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="stat-services">0</span>
+                            <span class="stat-label">Servicios</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="stat-rating">0</span>
+                            <span class="stat-label">Calificación</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lado derecho - Formularios -->
+            <div class="auth-form-container">
+                <div class="form-card">
+                    <div class="form-tabs">
+                        <button class="form-tab active" data-tab="login">Iniciar Sesión</button>
+                        <button class="form-tab" data-tab="register">Crear Cuenta</button>
+                    </div>
+                    
+                    <!-- Formulario de Login -->
+                    <form id="login-form" class="auth-form active">
+                        <div class="input-field">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" placeholder="correo@ejemplo.com" id="login-email" required autocomplete="email">
+                        </div>
+                        <div class="input-field">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" placeholder="Contraseña" id="login-password" required autocomplete="current-password">
+                        </div>
+                        <button type="submit" class="btn-primary btn-block">
+                            <i class="fas fa-arrow-right"></i> Ingresar
+                        </button>
+                    </form>
+                    
+                    <!-- Formulario de Registro -->
+                    <form id="register-form" class="auth-form">
+                        <div class="input-field">
+                            <i class="fas fa-user"></i>
+                            <input type="text" placeholder="Nombre completo" id="reg-name" required autocomplete="name">
+                        </div>
+                        <div class="input-field">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" placeholder="correo@ejemplo.com" id="reg-email" required autocomplete="email">
+                        </div>
+                        <div class="input-field">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" placeholder="Teléfono (opcional)" id="reg-phone" autocomplete="tel">
+                        </div>
+                        <div class="input-field">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" placeholder="Contraseña (mínimo 6 caracteres)" id="reg-password" required autocomplete="new-password">
+                        </div>
+                        <div class="input-field">
+                            <i class="fas fa-user-tag"></i>
+                            <select id="reg-role">
+                                <option value="cliente">Cliente - Necesito servicios</option>
+                                <option value="trabajador">Trabajador - Ofrezco servicios</option>
+                            </select>
+                        </div>
+                        <div id="skills-field" style="display: none;">
+                            <div class="input-field">
+                                <i class="fas fa-tools"></i>
+                                <input type="text" placeholder="Tus habilidades (ej: Plomería, Electricidad, Limpieza)" id="reg-skills">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary btn-block">
+                            <i class="fas fa-user-plus"></i> Crear cuenta
+                        </button>
+                    </form>
+                    
+                    <p class="terms-text">Al registrarte aceptas nuestros <a href="#">Términos y Condiciones</a> y <a href="#">Política de Privacidad</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- DASHBOARD PRINCIPAL (POST-LOGIN) -->
+    <!-- ========================================== -->
+    <div id="dashboard" style="display: none;">
+        
+        <!-- Header con navegación -->
+        <header class="dashboard-header">
+            <div class="header-container">
+                <div class="logo">
+                    <i class="fas fa-handshake"></i>
+                    <span>Hogar<span>Connect</span></span>
+                </div>
+                
+                <!-- Navegación principal -->
+                <nav class="main-nav">
+                    <button class="nav-link active" data-view="marketplace">
+                        <i class="fas fa-store"></i> Marketplace
+                    </button>
+                    <button class="nav-link" data-view="mis-servicios">
+                        <i class="fas fa-clipboard-list"></i> Mis Servicios
+                    </button>
+                    <button class="nav-link" data-view="favoritos">
+                        <i class="fas fa-heart"></i> Favoritos
+                    </button>
+                    <button class="nav-link" data-view="analytics">
+                        <i class="fas fa-chart-line"></i> Analytics
+                    </button>
+                    <button class="nav-link" data-view="perfil">
+                        <i class="fas fa-user-circle"></i> Perfil
+                    </button>
+                </nav>
+                
+                <!-- Menú de usuario -->
+                <div class="user-menu">
+                    <!-- Notificaciones -->
+                    <div class="notification-bell" id="notification-bell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <div class="notification-header">
+                                <h4>Notificaciones</h4>
+                                <button class="mark-all-read" id="mark-all-read">Marcar todas como leídas</button>
+                            </div>
+                            <div class="notification-list" id="notification-list"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Selector de tema (modo oscuro/claro) -->
+                    <div class="theme-toggle">
+                        <button id="theme-light" class="active">🌞</button>
+                        <button id="theme-dark">🌙</button>
+                    </div>
+                    
+                    <!-- Avatar y datos del usuario -->
+                    <div class="user-avatar" id="user-avatar">
+                        <span id="user-avatar-text">U</span>
+                    </div>
+                    <div class="user-details">
+                        <span id="user-name" class="user-name"></span>
+                        <span id="user-role" class="user-role-badge"></span>
+                    </div>
+                    <button id="logout-btn" class="btn-icon" title="Cerrar sesión">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Contenido principal -->
+        <main class="dashboard-main">
+            
+            <!-- ========== VISTA: MARKETPLACE ========== -->
+            <div id="marketplace-view" class="view active">
+                <div class="view-header">
+                    <h2><i class="fas fa-store"></i> Marketplace de Servicios</h2>
+                    <button id="show-publish-btn" class="btn-primary">
+                        <i class="fas fa-plus"></i> Publicar Servicio
+                    </button>
+                </div>
+                
+                <!-- Formulario para publicar servicio -->
+                <div id="publish-form" class="publish-card" style="display: none;">
+                    <h3><i class="fas fa-pen-alt"></i> Nueva Solicitud de Servicio</h3>
+                    <div class="form-grid">
+                        <input type="text" id="service-title" placeholder="Título del servicio" class="full-width">
+                        <textarea id="service-desc" placeholder="Descripción detallada del trabajo a realizar" rows="3"></textarea>
+                        <input type="text" id="service-location" placeholder="Dirección donde se realizará el servicio">
+                        <select id="service-category">
+                            <option value="Plomería">Plomería</option>
+                            <option value="Electricidad">Electricidad</option>
+                            <option value="Limpieza">Limpieza</option>
+                            <option value="Carpintería">Carpintería</option>
+                            <option value="Jardinería">Jardinería</option>
+                            <option value="Pintura">Pintura</option>
+                            <option value="Mudanzas">Mudanzas</option>
+                            <option value="Reparaciones">Reparaciones</option>
+                            <option value="Electrodomésticos">Electrodomésticos</option>
+                            <option value="Cerrajería">Cerrajería</option>
+                            <option value="General">General</option>
+                        </select>
+                        <input type="number" id="service-price" placeholder="Precio propuesto ($)">
+                    </div>
+                    <div class="form-actions">
+                        <button id="submit-service" class="btn-primary">Publicar Servicio</button>
+                        <button id="cancel-publish" class="btn-secondary">Cancelar</button>
+                    </div>
+                </div>
+                
+                <!-- Barra de filtros avanzados -->
+                <div class="filters-bar">
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label>Categoría</label>
+                            <select id="filter-category">
+                                <option value="all">Todas las categorías</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Rango de precio</label>
+                            <div class="price-range">
+                                <input type="number" id="filter-min-price" placeholder="Mínimo">
+                                <input type="number" id="filter-max-price" placeholder="Máximo">
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label>Ordenar por</label>
+                            <select id="filter-sort">
+                                <option value="recent">Más recientes</option>
+                                <option value="price_asc">Menor precio</option>
+                                <option value="price_desc">Mayor precio</option>
+                            </select>
+                        </div>
+                        <div class="filter-group search-box">
+                            <label>Buscar</label>
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-input" placeholder="Buscar servicios...">
+                        </div>
+                    </div>
+                    <div class="filters-actions">
+                        <button id="apply-filters" class="btn-primary">Aplicar filtros</button>
+                        <button id="reset-filters" class="btn-secondary">Limpiar</button>
+                    </div>
+                </div>
+                
+                <!-- Lista de servicios -->
+                <div id="services-list" class="services-container"></div>
+            </div>
+            
+            <!-- ========== VISTA: MIS SERVICIOS ========== -->
+            <div id="mis-servicios-view" class="view">
+                <div class="view-header">
+                    <h2><i class="fas fa-clipboard-list"></i> Mis Servicios</h2>
+                </div>
+                <div id="my-services-list" class="services-container"></div>
+            </div>
+            
+            <!-- ========== VISTA: FAVORITOS ========== -->
+            <div id="favoritos-view" class="view">
+                <div class="view-header">
+                    <h2><i class="fas fa-heart"></i> Servicios Favoritos</h2>
+                </div>
+                <div id="favorites-list" class="services-container"></div>
+            </div>
+            
+            <!-- ========== VISTA: ANALYTICS ========== -->
+            <div id="analytics-view" class="view">
+                <div class="view-header">
+                    <h2><i class="fas fa-chart-line"></i> Estadísticas de la Plataforma</h2>
+                    <button id="start-tour" class="btn-secondary">
+                        <i class="fas fa-question-circle"></i> Tour guiado
+                    </button>
+                </div>
+                <div id="analytics-container"></div>
+            </div>
+            
+            <!-- ========== VISTA: PERFIL ========== -->
+            <div id="perfil-view" class="view">
+                <div class="view-header">
+                    <h2><i class="fas fa-user-circle"></i> Mi Perfil</h2>
+                </div>
+                <div id="profile-content" class="profile-container"></div>
+            </div>
+            
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODALES -->
+    <!-- ========================================== -->
+    
+    <!-- Modal de Chat -->
+    <div id="chat-modal" class="modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3><i class="fas fa-comments"></i> Conversación</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="chat-container">
+                <div class="chat-sidebar" id="chat-sidebar"></div>
+                <div class="chat-conversation">
+                    <div id="chat-messages" class="chat-messages"></div>
+                    <div class="chat-input-area">
+                        <button class="emoji-picker-btn" id="emoji-picker-btn">
+                            <i class="far fa-smile-wink"></i>
+                        </button>
+                        <input type="text" id="chat-message-input" placeholder="Escribe tu mensaje...">
+                        <button id="chat-send-btn" class="btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Calificación -->
+    <div id="rating-modal" class="modal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-header">
+                <h3><i class="fas fa-star"></i> Calificar Servicio</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="rating-container">
+                <div class="rating-stars">
+                    <i class="far fa-star" data-rating="1"></i>
+                    <i class="far fa-star" data-rating="2"></i>
+                    <i class="far fa-star" data-rating="3"></i>
+                    <i class="far fa-star" data-rating="4"></i>
+                    <i class="far fa-star" data-rating="5"></i>
+                </div>
+                <textarea id="rating-comment" placeholder="Comparte tu experiencia con este trabajador..."></textarea>
+                <button id="submit-rating" class="btn-primary btn-block">Enviar Calificación</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Edición de Perfil -->
+    <div id="edit-profile-modal" class="modal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-edit"></i> Editar Perfil</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-field">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="edit-phone" placeholder="Teléfono">
+                </div>
+                <div class="input-field">
+                    <i class="fas fa-info-circle"></i>
+                    <textarea id="edit-description" placeholder="Descripción / Biografía" rows="3"></textarea>
+                </div>
+                <div id="edit-skills-container" style="display: none;">
+                    <div class="input-field">
+                        <i class="fas fa-tools"></i>
+                        <input type="text" id="edit-skills" placeholder="Habilidades (separadas por coma)">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-profile" class="btn-primary">Guardar cambios</button>
+                <button class="btn-secondary modal-close">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TOUR GUIADO (Overlay) -->
+    <!-- ========================================== -->
+    <div id="tour-overlay" class="tour-overlay" style="display: none;"></div>
+    <div id="tour-step" class="tour-step" style="display: none;">
+        <h4 id="tour-title"></h4>
+        <p id="tour-content"></p>
+        <div class="tour-buttons">
+            <button id="tour-next" class="btn-primary">Siguiente</button>
+            <button id="tour-end" class="btn-secondary">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Script principal -->
+    <script src="app.js"></script>
+</body>
+</html>
