@@ -26,14 +26,14 @@
     --border-light: #f3f4f6;
 
     /* Marca — azul marino profundo + dorado refinado */
-    --primary:       #0f172a;
-    --primary-dark:  #080f1e;
-    --primary-light: #1e293b;
+    --primary:       #081c11;
+    --primary-dark:  #050f09;
+    --primary-light: #1b4332;
 
-    --accent:        #b8960c;
-    --accent-dark:   #96790a;
-    --accent-light:  #d4a80e;
-    --accent-glow:   rgba(184,150,12,0.15);
+    --accent:        #2d6a4f;
+    --accent-dark:   #1b4332;
+    --accent-light:  #40916c;
+    --accent-glow:   rgba(45,106,79,0.12);
 
     /* Semánticos */
     --success:       #059669;
@@ -51,7 +51,7 @@
     --shadow-lg:  0 8px 24px rgba(0,0,0,0.10);
     --shadow-xl:  0 16px 40px rgba(0,0,0,0.12);
     --shadow-2xl: 0 32px 64px rgba(0,0,0,0.14);
-    --shadow-accent: 0 8px 24px rgba(184,150,12,0.25);
+    --shadow-accent: 0 8px 24px rgba(45,106,79,0.28);
 
     /* Radios */
     --radius-sm: 8px;
@@ -77,13 +77,13 @@
     --border:       #1f2937;
     --border-light: #161b27;
 
-    --primary:       #161b27;
-    --primary-light: #1f2937;
+    --primary:       #0d2318;
+    --primary-light: #1b4332;
 
-    --accent:        #c9a82a;
-    --accent-dark:   #b8960c;
-    --accent-light:  #d4b84a;
-    --accent-glow:   rgba(201,168,42,0.12);
+    --accent:        #52b788;
+    --accent-dark:   #2d6a4f;
+    --accent-light:  #74c69d;
+    --accent-glow:   rgba(82,183,136,0.12);
 
     --shadow-sm:  0 1px 3px rgba(0,0,0,0.3);
     --shadow-md:  0 4px 12px rgba(0,0,0,0.4);
@@ -142,7 +142,7 @@ body {
     justify-content: center;
     padding: 24px;
     background:
-        radial-gradient(ellipse at 20% 50%, rgba(184,150,12,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 50%, rgba(45,106,79,0.06) 0%, transparent 60%),
         radial-gradient(ellipse at 80% 20%, rgba(37,99,235,0.04) 0%, transparent 50%),
         var(--bg-secondary);
 }
@@ -161,7 +161,7 @@ body {
 
 .auth-hero {
     background:
-        linear-gradient(145deg, #0f172a 0%, #1e293b 60%, #0f1f35 100%);
+        linear-gradient(145deg, #0b2618 0%, #1b4332 60%, #0d2d1f 100%);
     padding: 56px 48px;
     display: flex;
     align-items: center;
@@ -177,7 +177,7 @@ body {
     right: -20%;
     width: 320px;
     height: 320px;
-    background: radial-gradient(circle, rgba(184,150,12,0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(45,106,79,0.12) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -201,7 +201,7 @@ body {
     color: var(--accent);
     margin-bottom: 18px;
     display: block;
-    filter: drop-shadow(0 0 12px rgba(184,150,12,0.4));
+    filter: drop-shadow(0 0 12px rgba(45,106,79,0.35));
 }
 
 .logo-large h1 {
@@ -378,7 +378,7 @@ body {
 .btn-primary:hover {
     background: var(--accent-dark);
     transform: translateY(-1px);
-    box-shadow: var(--shadow-accent);
+    box-shadow: 0 8px 24px rgba(45,106,79,0.35);
 }
 
 .btn-primary:active { transform: translateY(0); }
@@ -527,7 +527,7 @@ body {
 .nav-link.active {
     background: var(--accent);
     color: white;
-    box-shadow: 0 2px 8px rgba(184,150,12,0.35);
+    box-shadow: 0 2px 8px rgba(45,106,79,0.35);
 }
 
 /* ========== MENÚ USUARIO ========== */
@@ -541,7 +541,7 @@ body {
 .user-avatar {
     width: 38px;
     height: 38px;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    background: linear-gradient(135deg, #40916c 0%, #1b4332 100%);
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
@@ -549,7 +549,7 @@ body {
     font-weight: 700;
     color: white;
     font-size: 0.875rem;
-    box-shadow: 0 2px 8px rgba(184,150,12,0.3);
+    box-shadow: 0 2px 8px rgba(45,106,79,0.3);
 }
 
 .user-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-md); }
@@ -721,7 +721,7 @@ body {
 
 .theme-toggle button.active {
     background: var(--accent);
-    box-shadow: 0 2px 6px rgba(184,150,12,0.3);
+    box-shadow: 0 2px 6px rgba(45,106,79,0.3);
 }
 
 /* ========== MAIN CONTENT ========== */
@@ -877,7 +877,7 @@ body {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    border: 1px solid rgba(184,150,12,0.2);
+    border: 1px solid rgba(45,106,79,0.2);
 }
 
 .favorite-btn {
@@ -1166,7 +1166,7 @@ body {
 }
 
 .chat-message-own .chat-message-bubble {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    background: linear-gradient(135deg, #40916c 0%, #1b4332 100%);
     color: white;
     border-bottom-left-radius: 18px;
     border-bottom-right-radius: 4px;
@@ -1242,7 +1242,7 @@ body {
 .rating-stars i.active {
     color: var(--accent);
     transform: scale(1.1);
-    filter: drop-shadow(0 0 6px rgba(184,150,12,0.4));
+    filter: drop-shadow(0 0 6px rgba(45,106,79,0.35));
 }
 
 .rating-container textarea {
@@ -1285,13 +1285,13 @@ body {
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 80px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    background: linear-gradient(135deg, #081c11 0%, #1b4332 100%);
 }
 
 .profile-avatar-large {
     width: 100px;
     height: 100px;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    background: linear-gradient(135deg, #40916c 0%, #1b4332 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1397,7 +1397,7 @@ body {
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 3px;
-    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+    background: linear-gradient(90deg, #2d6a4f 0%, #52b788 100%);
 }
 
 .stat-widget:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
