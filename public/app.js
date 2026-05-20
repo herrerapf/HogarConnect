@@ -276,7 +276,7 @@ function renderNotifications() {
     }
     
     container.innerHTML = notifications.map(notif => `
-        <div class="notification-item ${!notif.read ? 'unread' : ''}" data-id="${notif.id}">
+        <div class="notification-item ${!notif.read ? 'unread' : ''}" data-id="${notif.id}" data-service-id="${notif.serviceId || ''}">
             <div class="notification-icon">
                 <i class="fas ${getNotificationIcon(notif.type)}"></i>
             </div>
@@ -285,8 +285,12 @@ function renderNotifications() {
                 <div class="notification-message">${escapeHtml(notif.message)}</div>
                 <div class="notification-time">${formatTime(notif.createdAt)}</div>
             </div>
+            ${notif.type === 'new_message' ? '<div class="notification-badge" style="position: static; margin-left: 8px;">📩</div>' : ''}
         </div>
     `).join('');
+    
+    // Agregar event listeners después de renderizar
+    setupNotificationClickListener();
 }
 
 function getNotificationIcon(type) {
@@ -1437,4 +1441,157 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+
+// ==============================================
+// FIX: ABRIR CHAT DESDE NOTIFICACIONES
+// ==============================================
+
+// Función mejorada para abrir chat desde notificaciones
+async function openChatFromNotification(notification) {
+    console.log('Abriendo chat desde notificación:', notification);
+    
+    // Extraer serviceId de la notificación
+    let serviceId = null;
+    
+    // Intentar obtener serviceId de diferentes formas
+    if (notification.serviceId) {
+        serviceId = notification.serviceId;
+    } else if (notification.data && notification.data.serviceId) {
+        serviceId = notification.data.serviceId;
+    } else if (notification.message) {
+        // Buscar en el mensaje si contiene "servicio #123"
+        const match = notification.message.match(/servicio #?(\d+)/i);
+        if (match) serviceId = match[1];
+    }
+    
+    if (!serviceId) {
+        showToast('No se pudo identificar el servicio relacionado', 'error');
+        return;
+    }
+    
+    // Abrir el chat
+    currentChatServiceId = parseInt(serviceId);
+    const modal = document.getElementById('chat-modal');
+    
+    if (!modal) {
+        showToast('Error al abrir el chat', 'error');
+        return;
+    }
+    
+    modal.classList.add('show');
+    
+    // Cargar mensajes del chat
+    await loadChatMessages();
+    await loadConversations();
+    
+    // Marcar notificación como leída
+    await markNotificationRead(notification.id);
+    
+    // Iniciar auto-refresh de mensajes
+    if (refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(() => {
+        if (currentChatServiceId) loadChatMessages();
+    }, 3000);
+    
+    showToast('Chat abierto', 'success');
+}
+
+// SOBRESCRIBIR el event listener de notificaciones para manejar mejor los clics
+function setupNotificationClickListener() {
+    const container = document.getElementById('notification-list');
+    if (!container) return;
+    
+    // Usar delegación de eventos para notificaciones existentes y futuras
+    container.addEventListener('click', async (e) => {
+        const notificationItem = e.target.closest('.notification-item');
+        if (!notificationItem) return;
+        
+        const notificationId = notificationItem.dataset.id;
+        if (!notificationId) return;
+        
+        // Buscar la notificación completa en el array
+        const notification = notifications.find(n => n.id == notificationId);
+        
+        if (notification) {
+            // Verificar si es una notificación de mensaje
+            if (notification.type === 'new_message' || 
+                notification.title?.toLowerCase().includes('mensaje') ||
+                notification.message?.toLowerCase().includes('mensaje')) {
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Marcar como leída primero
+                await markNotificationRead(notificationId);
+                
+                // Abrir el chat
+                await openChatFromNotification(notification);
+                return;
+            }
+        }
+        
+        // Para otras notificaciones, solo marcar como leída
+        await markNotificationRead(notificationId);
+    });
+}
+
+// Función para forzar la actualización de notificaciones y reconectar eventos
+async function refreshNotificationsAndChat() {
+    await loadNotifications();
+    setupNotificationClickListener();
+}
+
+// Agregar listener para el botón del chat en el modal (asegurar que existe)
+function ensureChatModalListeners() {
+    const modal = document.getElementById('chat-modal');
+    if (!modal) return;
+    
+    // Asegurar que el botón de cerrar funciona
+    const closeBtn = modal.querySelector('.modal-close');
+    if (closeBtn && !closeBtn.hasListener) {
+        closeBtn.hasListener = true;
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('show');
+            if (refreshInterval) clearInterval(refreshInterval);
+            currentChatServiceId = null;
+        });
+    }
+    
+    // Asegurar que el botón de enviar funciona
+    const sendBtn = document.getElementById('chat-send-btn');
+    if (sendBtn && !sendBtn.hasListener) {
+        sendBtn.hasListener = true;
+        sendBtn.addEventListener('click', sendMessage);
+    }
+    
+    // Asegurar que el input de mensaje envía con Enter
+    const messageInput = document.getElementById('chat-message-input');
+    if (messageInput && !messageInput.hasListener) {
+        messageInput.hasListener = true;
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    }
+}
+
+// Sobrescribir la función renderNotifications original para agregar datos de servicio
+const originalRenderNotifications = renderNotifications;
+window.renderNotifications = function() {
+    originalRenderNotifications();
+    setupNotificationClickListener();
+};
+
+// Inicializar todo al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    // Pequeño delay para asegurar que todo está cargado
+    setTimeout(() => {
+        setupNotificationClickListener();
+        ensureChatModalListeners();
+    }, 500);
+});
+
+// Exportar funciones para uso global
+window.openChatFromNotification = openChatFromNotification;
+window.refreshNotificationsAndChat = refreshNotificationsAndChat;
+
 }
