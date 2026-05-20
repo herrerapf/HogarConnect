@@ -34,7 +34,13 @@
       "createdAt": "2026-04-20T11:24:39.265869"
     }
   ],
-  "userSessions": [],
+  "userSessions": [
+    {
+      "userId": "1776702279231",
+      "lastActivity": "2026-05-19T22:39:11.412813",
+      "token": "1779248351412"
+    }
+  ],
   "categories": [
     "Plomería",
     "Electricidad",
