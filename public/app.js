@@ -37,6 +37,7 @@ async function init() {
         await loadNotifications();
         await loadFavorites();
         startActivityMonitoring();
+        startNotificationAutoRefresh();
     }
     
     initTheme();
@@ -180,6 +181,7 @@ async function registerUser(event) {
         await initDashboard();
         await loadNotifications();
         await loadFavorites();
+        startNotificationAutoRefresh();
         
     } catch (error) {
         showToast(error.message, 'error');
@@ -211,6 +213,7 @@ async function loginUser(event) {
         await loadNotifications();
         await loadFavorites();
         startActivityMonitoring();
+        startNotificationAutoRefresh();
         
     } catch (error) {
         showToast(error.message, 'error');
@@ -231,8 +234,10 @@ async function logout() {
     localStorage.removeItem('hogarconnect_token');
     currentUser = null;
     authToken = null;
+    _seenNotificationIds = new Set();
     
     if (refreshInterval) clearInterval(refreshInterval);
+    stopNotificationAutoRefresh();
     
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('auth-container').style.display = 'flex';
@@ -240,17 +245,51 @@ async function logout() {
 }
 
 // ========== NOTIFICACIONES ==========
+// IDs ya vistos para detectar notificaciones nuevas
+let _seenNotificationIds = new Set();
+let _notifAutoRefresh = null;
+
 async function loadNotifications() {
     try {
         const response = await fetch(`${API_URL}/notifications`, {
             headers: getAuthHeaders()
         });
-        notifications = await response.json();
+        const fresh = await response.json();
+
+        // Detectar notificaciones nuevas no vistas aún
+        if (_seenNotificationIds.size > 0) {
+            fresh.forEach(n => {
+                if (!_seenNotificationIds.has(n.id) && !n.read) {
+                    if (n.type === 'service_accepted') {
+                        showToast('✅ ¡Tu servicio fue aceptado! Ya puedes chatear con el trabajador.', 'success');
+                    } else if (n.type === 'negotiation') {
+                        showToast('💬 El trabajador hizo una contraoferta. Revisa Mis Servicios.', 'info');
+                    } else if (n.type === 'new_message') {
+                        showToast('📩 Tienes un mensaje nuevo.', 'info');
+                    }
+                }
+            });
+        }
+        fresh.forEach(n => _seenNotificationIds.add(n.id));
+
+        notifications = fresh;
         updateNotificationBadge();
         renderNotifications();
     } catch (error) {
         console.error('Error loading notifications:', error);
     }
+}
+
+function startNotificationAutoRefresh() {
+    if (_notifAutoRefresh) clearInterval(_notifAutoRefresh);
+    _notifAutoRefresh = setInterval(() => {
+        if (currentUser) loadNotifications();
+    }, 15000);
+}
+
+function stopNotificationAutoRefresh() {
+    if (_notifAutoRefresh) clearInterval(_notifAutoRefresh);
+    _notifAutoRefresh = null;
 }
 
 function updateNotificationBadge() {
@@ -580,28 +619,44 @@ function createServiceCard(service, type) {
     
     let actions = '';
     
-    if (type === 'marketplace' && currentUser.role === 'trabajador' && service.status === 'pending') {
-        actions = `
-            <div class="service-card-footer">
-                <button class="btn-primary accept-service" data-id="${service.id}">
-                    <i class="fas fa-check"></i> Aceptar
-                </button>
-                <button class="btn-secondary negotiate-service" data-id="${service.id}">
-                    <i class="fas fa-exchange-alt"></i> Negociar
-                </button>
-            </div>
-        `;
+    if (type === 'marketplace' && currentUser.role === 'trabajador') {
+        if (service.status === 'pending') {
+            actions = `
+                <div class="service-card-footer">
+                    <button class="btn-primary accept-service" data-id="${service.id}">
+                        <i class="fas fa-check"></i> Aceptar
+                    </button>
+                    <button class="btn-secondary negotiate-service" data-id="${service.id}">
+                        <i class="fas fa-exchange-alt"></i> Negociar
+                    </button>
+                </div>
+            `;
+        } else if ((service.status === 'accepted' || service.status === 'negotiated') &&
+                   String(service.workerId) === String(currentUser.id)) {
+            // Este trabajador ya aceptó/negoció este servicio → mostrar chat
+            actions = `
+                <div class="service-card-footer">
+                    <button class="btn-secondary open-chat" data-id="${service.id}">
+                        <i class="fas fa-comments"></i> Chat con cliente
+                    </button>
+                </div>
+            `;
+        }
     } else if (type === 'mis-servicios') {
         if (currentUser.role === 'cliente') {
+            // El cliente siempre puede chatear si hay un trabajador asignado
+            const hasWorker = !!service.workerId;
+            const chatBtn = hasWorker
+                ? `<button class="btn-secondary open-chat" data-id="${service.id}"><i class="fas fa-comments"></i> Chat</button>`
+                : '';
+
             if (service.status === 'negotiated') {
                 actions = `
                     <div class="service-card-footer">
                         <button class="btn-primary accept-negotiation" data-id="${service.id}">
                             <i class="fas fa-check"></i> Aceptar Contraoferta
                         </button>
-                        <button class="btn-secondary open-chat" data-id="${service.id}">
-                            <i class="fas fa-comments"></i> Chat
-                        </button>
+                        ${chatBtn}
                     </div>
                 `;
             } else if (service.status === 'accepted') {
@@ -610,9 +665,7 @@ function createServiceCard(service, type) {
                         <button class="btn-primary complete-service" data-id="${service.id}">
                             <i class="fas fa-check-double"></i> Completar
                         </button>
-                        <button class="btn-secondary open-chat" data-id="${service.id}">
-                            <i class="fas fa-comments"></i> Chat
-                        </button>
+                        ${chatBtn}
                     </div>
                 `;
             } else if (service.status === 'completed') {
@@ -621,21 +674,20 @@ function createServiceCard(service, type) {
                         <button class="btn-primary rate-service" data-id="${service.id}">
                             <i class="fas fa-star"></i> Calificar
                         </button>
-                        <button class="btn-secondary open-chat" data-id="${service.id}">
-                            <i class="fas fa-comments"></i> Chat
-                        </button>
+                        ${chatBtn}
                     </div>
                 `;
-            } else {
+            } else if (hasWorker) {
+                // pending pero con trabajador asignado
                 actions = `
                     <div class="service-card-footer">
-                        <button class="btn-secondary open-chat" data-id="${service.id}">
-                            <i class="fas fa-comments"></i> Chat
-                        </button>
+                        ${chatBtn}
                     </div>
                 `;
             }
-        } else if (currentUser.role === 'trabajador' && (service.status === 'accepted' || service.status === 'negotiated')) {
+        } else if (currentUser.role === 'trabajador' &&
+                   (service.status === 'accepted' || service.status === 'negotiated' || service.status === 'completed') &&
+                   String(service.workerId) === String(currentUser.id)) {
             actions = `
                 <div class="service-card-footer">
                     <button class="btn-secondary open-chat" data-id="${service.id}">
@@ -961,6 +1013,29 @@ async function submitRating() {
         
     } catch (error) {
         showToast(error.message, 'error');
+    }
+}
+
+// Abre el chat con un trabajador buscando el servicio activo entre ambos
+async function openChatWithWorker(workerId) {
+    try {
+        const response = await fetch(`${API_URL}/services`, { headers: getAuthHeaders() });
+        const services = await response.json();
+
+        // Buscar servicio activo donde este trabajador está asignado
+        const active = services.find(s =>
+            String(s.workerId) === String(workerId) &&
+            ['accepted', 'negotiated', 'completed'].includes(s.status)
+        );
+
+        if (!active) {
+            showToast('No hay un servicio activo con este trabajador aún.', 'info');
+            return;
+        }
+
+        openChat(active.id);
+    } catch (error) {
+        showToast('Error al buscar el servicio activo', 'error');
     }
 }
 
@@ -1742,16 +1817,8 @@ function ensureChatModalListeners() {
     }
 }
 
-// Sobrescribir la función renderNotifications original para agregar datos de servicio
-const originalRenderNotifications = renderNotifications;
-window.renderNotifications = function() {
-    originalRenderNotifications();
-    setupNotificationClickListener();
-};
-
-// Inicializar todo al cargar
+// Inicializar listeners del chat modal al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
-    // Pequeño delay para asegurar que todo está cargado
     setTimeout(() => {
         setupNotificationClickListener();
         ensureChatModalListeners();
@@ -1761,3 +1828,4 @@ document.addEventListener('DOMContentLoaded', () => {
 // Exportar funciones para uso global
 window.openChatFromNotification = openChatFromNotification;
 window.refreshNotificationsAndChat = refreshNotificationsAndChat;
+window.openChatWithWorker = openChatWithWorker;
