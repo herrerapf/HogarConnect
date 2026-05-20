@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from functools import wraps
 import re
 import hashlib
+import base64
 from dotenv import load_dotenv
 
 # Cargar variables de entorno
@@ -36,6 +37,11 @@ limiter = Limiter(
 DB_PATH = 'database.json'
 PORT = int(os.getenv('PORT', 5000))
 SESSION_TIMEOUT = 30  # minutos
+UPLOAD_FOLDER = 'public/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+MAX_FILE_SIZE = 2 * 1024 * 1024  # 2MB
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 # FUNCIONES DE BASE DE DATOS
@@ -149,6 +155,38 @@ def index():
 @app.route('/<path:path>')
 def serve_static(path):
     return send_from_directory('public', path)
+
+
+# API - SUBIDA DE FOTO DE PERFIL
+@app.route('/api/users/<user_id>/photo', methods=['POST'])
+@jwt_required()
+def upload_profile_photo(user_id):
+    try:
+        current_user = get_jwt_identity()
+        if current_user['id'] != user_id:
+            return jsonify({'error': 'No autorizado'}), 403
+
+        data = request.json
+        image_data = data.get('image')  # base64 string
+        if not image_data:
+            return jsonify({'error': 'No se recibió imagen'}), 400
+
+        # Validar tamaño (base64 ~33% más grande que binario)
+        if len(image_data) > MAX_FILE_SIZE * 1.4:
+            return jsonify({'error': 'La imagen es demasiado grande (máx 2MB)'}), 400
+
+        # Guardar como data URL directamente en el perfil del usuario
+        db = read_db()
+        user_index = next((i for i, u in enumerate(db['users']) if u['id'] == user_id), None)
+        if user_index is None:
+            return jsonify({'error': 'Usuario no encontrado'}), 404
+
+        db['users'][user_index]['photoUrl'] = image_data
+        write_db(db)
+
+        return jsonify({'success': True, 'photoUrl': image_data})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 # API - AUTENTICACIÓN
@@ -848,6 +886,7 @@ def get_user_profile(user_id):
             'name': user['name'],
             'role': user['role'],
             'avatar': user.get('avatar', user['name'][0].upper()),
+            'photoUrl': user.get('photoUrl', None),
             'description': user.get('description', ''),
             'rating': user.get('rating', 0),
             'totalRatings': user.get('totalRatings', 0),

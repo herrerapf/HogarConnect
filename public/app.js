@@ -791,10 +791,20 @@ async function openChat(serviceId) {
     currentChatServiceId = serviceId;
     const modal = document.getElementById('chat-modal');
     modal.classList.add('show');
-    
+
+    // Update modal header with service title if available
+    try {
+        const allServices = await fetch(`${API_URL}/services`, { headers: getAuthHeaders() }).then(r => r.json());
+        const service = allServices.find(s => s.id === serviceId);
+        const titleEl = modal.querySelector('.modal-header h3');
+        if (titleEl && service) {
+            titleEl.innerHTML = `<i class="fas fa-message-dots"></i> ${escapeHtml(service.title.substring(0, 35))}${service.title.length > 35 ? '...' : ''}`;
+        }
+    } catch (e) { /* silently ignore */ }
+
     await loadChatMessages();
     await loadConversations();
-    
+
     if (refreshInterval) clearInterval(refreshInterval);
     refreshInterval = setInterval(() => {
         if (currentChatServiceId) loadChatMessages();
@@ -977,16 +987,20 @@ async function loadProfile() {
 
 function renderProfile(profile, userStats, ratings) {
     const container = document.getElementById('profile-content');
-    
+
+    const avatarHtml = profile.photoUrl
+        ? `<img src="${profile.photoUrl}" alt="${escapeHtml(profile.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+        : (profile.avatar || profile.name.charAt(0).toUpperCase());
+
     container.innerHTML = `
         <div class="profile-header">
-            <div class="profile-avatar-large">
-                ${profile.avatar || profile.name.charAt(0).toUpperCase()}
+            <div class="profile-avatar-large" id="profile-avatar-display">
+                ${avatarHtml}
             </div>
             <div class="profile-name">${escapeHtml(profile.name)}</div>
             <div class="profile-role">${profile.role === 'cliente' ? 'Cliente' : 'Trabajador'}</div>
             ${profile.verified ? '<span class="service-category"><i class="fas fa-check-circle"></i> Verificado</span>' : ''}
-            
+
             <div class="profile-stats">
                 <div class="profile-stat">
                     <div class="profile-stat-value">${profile.rating || 0}</div>
@@ -1001,8 +1015,18 @@ function renderProfile(profile, userStats, ratings) {
                     <div class="profile-stat-label">Trabajos</div>
                 </div>
             </div>
+
+            <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                <label class="btn-secondary" style="cursor:pointer;font-size:0.8125rem;padding:10px 18px;border-radius:12px;">
+                    <i class="fas fa-camera"></i> Cambiar foto
+                    <input type="file" id="photo-upload-input" accept="image/*" style="display:none;">
+                </label>
+                <button class="btn-secondary" id="edit-profile-btn" style="font-size:0.8125rem;">
+                    <i class="fas fa-user-pen"></i> Editar perfil
+                </button>
+            </div>
         </div>
-        
+
         <div class="profile-card">
             <div class="profile-card-title">Información de contacto</div>
             <div class="profile-field">
@@ -1018,7 +1042,7 @@ function renderProfile(profile, userStats, ratings) {
                 <div class="profile-field-value">${new Date(profile.createdAt).toLocaleDateString()}</div>
             </div>
         </div>
-        
+
         ${profile.role === 'trabajador' ? `
             <div class="profile-card">
                 <div class="profile-card-title">Habilidades</div>
@@ -1026,7 +1050,6 @@ function renderProfile(profile, userStats, ratings) {
                     ${profile.skills?.length ? profile.skills.map(s => `<span class="service-category">${escapeHtml(s)}</span>`).join(' ') : 'No especificadas'}
                 </div>
             </div>
-            
             <div class="profile-card">
                 <div class="profile-card-title">Estadísticas profesionales</div>
                 <div class="profile-field">
@@ -1051,23 +1074,81 @@ function renderProfile(profile, userStats, ratings) {
                 </div>
             </div>
         `}
-        
+
         ${ratings.length > 0 ? `
             <div class="profile-card">
                 <div class="profile-card-title">Opiniones recientes</div>
                 ${ratings.slice(0, 3).map(r => `
-                    <div class="profile-field">
-                        <div class="profile-field-value">
-                            ${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}
-                            <span style="font-size: 0.75rem; color: var(--text-muted);"> - ${new Date(r.createdAt).toLocaleDateString()}</span>
+                    <div class="profile-field" style="flex-direction:column;gap:6px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="color:var(--accent);font-size:1rem;">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+                            <span style="font-size:0.6875rem;color:var(--text-muted);">${new Date(r.createdAt).toLocaleDateString()}</span>
                         </div>
-                        <div class="profile-field-value" style="font-size: 0.8125rem;">"${escapeHtml(r.comment)}"</div>
-                        ${r.workerResponse ? `<div class="profile-field-value" style="font-size: 0.75rem; color: var(--accent);">Respuesta: ${escapeHtml(r.workerResponse)}</div>` : ''}
+                        <div style="font-size:0.8125rem;color:var(--text-secondary);">"${escapeHtml(r.comment)}"</div>
+                        ${r.workerResponse ? `<div style="font-size:0.75rem;color:var(--accent);padding-left:8px;border-left:2px solid var(--accent);">Respuesta: ${escapeHtml(r.workerResponse)}</div>` : ''}
                     </div>
                 `).join('')}
             </div>
         ` : ''}
     `;
+
+    // Listener para subir foto
+    document.getElementById('photo-upload-input')?.addEventListener('change', handlePhotoUpload);
+    // Listener para editar perfil
+    document.getElementById('edit-profile-btn')?.addEventListener('click', () => {
+        document.getElementById('edit-profile-modal').classList.add('show');
+        document.getElementById('edit-phone').value = profile.phone || '';
+        document.getElementById('edit-description').value = profile.description || '';
+        const skillsContainer = document.getElementById('edit-skills-container');
+        if (skillsContainer) {
+            skillsContainer.style.display = profile.role === 'trabajador' ? 'block' : 'none';
+            if (profile.role === 'trabajador') {
+                document.getElementById('edit-skills').value = profile.skills?.join(', ') || '';
+            }
+        }
+    });
+}
+
+async function handlePhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+        showToast('La imagen no puede superar 2MB', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const base64 = e.target.result;
+
+        try {
+            const response = await fetch(`${API_URL}/users/${currentUser.id}/photo`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ image: base64 })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+
+            // Actualizar en memoria y localStorage
+            currentUser.photoUrl = base64;
+            saveSession(currentUser, authToken);
+
+            // Actualizar avatar en header
+            const avatarEl = document.querySelector('.user-avatar');
+            if (avatarEl) avatarEl.innerHTML = `<img src="${base64}" alt="${currentUser.name}">`;
+
+            // Actualizar avatar en perfil
+            const profileAvatar = document.getElementById('profile-avatar-display');
+            if (profileAvatar) profileAvatar.innerHTML = `<img src="${base64}" alt="${currentUser.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+
+            showToast('Foto de perfil actualizada', 'success');
+        } catch (error) {
+            showToast(error.message || 'Error al subir foto', 'error');
+        }
+    };
+    reader.readAsDataURL(file);
 }
 
 // ========== ESTADÍSTICAS Y ANALYTICS ==========
@@ -1108,8 +1189,8 @@ function renderCharts(stats) {
                 datasets: [{
                     label: 'Servicios por mes',
                     data: counts,
-                    borderColor: '#c6a43f',
-                    backgroundColor: 'rgba(198, 164, 63, 0.1)',
+                    borderColor: '#52b788',
+                    backgroundColor: 'rgba(82,183,136,0.12)',
                     tension: 0.3,
                     fill: true
                 }]
@@ -1136,7 +1217,7 @@ function renderCharts(stats) {
                 labels: categories,
                 datasets: [{
                     data: counts,
-                    backgroundColor: ['#c6a43f', '#10b981', '#3b82f6', '#ef4444', '#f59e0b', '#8b5cf6']
+                    backgroundColor: ['#52b788', '#2d6a4f', '#74c69d', '#1b4332', '#40916c', '#95d5b2']
                 }]
             },
             options: {
@@ -1288,25 +1369,111 @@ async function loadAnalytics() {
 async function initDashboard() {
     document.getElementById('auth-container').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
-    
+
     document.getElementById('user-name').textContent = currentUser.name;
     document.getElementById('user-role').textContent = currentUser.role === 'cliente' ? 'Cliente' : 'Trabajador';
-    
+
+    // Cargar foto si existe
     const avatarEl = document.querySelector('.user-avatar');
     if (avatarEl) {
-        avatarEl.innerHTML = currentUser.name.charAt(0).toUpperCase();
+        if (currentUser.photoUrl) {
+            avatarEl.innerHTML = `<img src="${currentUser.photoUrl}" alt="${currentUser.name}">`;
+        } else {
+            avatarEl.innerHTML = currentUser.name.charAt(0).toUpperCase();
+        }
     }
-    
+
     const publishBtn = document.getElementById('show-publish-btn');
     if (publishBtn) {
         publishBtn.style.display = currentUser.role === 'cliente' ? 'flex' : 'none';
     }
-    
+
+    // Inyectar bottom nav móvil si no existe
+    if (!document.getElementById('mobile-bottom-nav') && window.innerWidth <= 480) {
+        injectMobileNav();
+    }
+
     switchView('marketplace');
+}
+
+function injectMobileNav() {
+    // Top bar móvil
+    const topBar = document.createElement('div');
+    topBar.className = 'mobile-top-bar';
+    topBar.innerHTML = `
+        <div class="logo" style="font-size:1rem;">
+            <i class="fas fa-hand-holding-heart"></i>
+            <span>Hogar<span style="color:var(--accent)">Connect</span></span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+            <div class="notification-bell" id="mobile-notif-bell" style="position:relative;">
+                <i class="fas fa-bell-ring"></i>
+                <span id="mobile-notif-badge" style="display:none;" class="notification-badge">0</span>
+            </div>
+            <button id="mobile-logout" class="btn-icon" style="font-size:1rem;">
+                <i class="fas fa-arrow-right-from-bracket"></i>
+            </button>
+        </div>
+    `;
+
+    // Bottom nav
+    const bottomNav = document.createElement('nav');
+    bottomNav.className = 'mobile-bottom-nav';
+    bottomNav.id = 'mobile-bottom-nav';
+    bottomNav.innerHTML = `
+        <button class="nav-link active" data-view="marketplace"><i class="fas fa-grid-2"></i><span>Inicio</span></button>
+        <button class="nav-link" data-view="mis-servicios"><i class="fas fa-briefcase"></i><span>Servicios</span></button>
+        <button class="nav-link" data-view="favoritos"><i class="fas fa-bookmark"></i><span>Guardados</span></button>
+        <button class="nav-link" data-view="analytics"><i class="fas fa-chart-mixed"></i><span>Stats</span></button>
+        <button class="nav-link" data-view="perfil"><i class="fas fa-circle-user"></i><span>Perfil</span></button>
+    `;
+
+    const dashboard = document.getElementById('dashboard');
+    dashboard.insertBefore(topBar, dashboard.firstChild);
+    dashboard.appendChild(bottomNav);
+
+    // Event listeners del bottom nav
+    bottomNav.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            bottomNav.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            switchView(link.dataset.view);
+        });
+    });
+
+    document.getElementById('mobile-logout')?.addEventListener('click', logout);
+    document.getElementById('mobile-notif-bell')?.addEventListener('click', toggleNotificationDropdown);
 }
 
 // ========== EVENT LISTENERS ==========
 function setupEventListeners() {
+    // Hamburger móvil
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const mainNav = document.getElementById('main-nav');
+    if (hamburgerBtn && mainNav) {
+        hamburgerBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mainNav.classList.toggle('open');
+            hamburgerBtn.innerHTML = mainNav.classList.contains('open')
+                ? '<i class="fas fa-times"></i>'
+                : '<i class="fas fa-bars"></i>';
+        });
+        // Cerrar nav al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!mainNav.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+                mainNav.classList.remove('open');
+                hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        });
+        // Cerrar nav al seleccionar una vista
+        mainNav.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mainNav.classList.remove('open');
+                hamburgerBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            });
+        });
+    }
+
     // Autenticación
     document.getElementById('login-form')?.addEventListener('submit', loginUser);
     document.getElementById('register-form')?.addEventListener('submit', registerUser);
@@ -1441,6 +1608,7 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
 
 // ==============================================
 // FIX: ABRIR CHAT DESDE NOTIFICACIONES
@@ -1593,5 +1761,3 @@ document.addEventListener('DOMContentLoaded', () => {
 // Exportar funciones para uso global
 window.openChatFromNotification = openChatFromNotification;
 window.refreshNotificationsAndChat = refreshNotificationsAndChat;
-
-}
